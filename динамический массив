@@ -24,14 +24,14 @@ class DynamicArray
 
     public int Get(int index)
     {
-        if (index < 0  index >= _count)
+        if (index < 0 || index >= _count)
             throw new IndexOutOfRangeException("Индекс вне допустимого диапазона!");
         return _array[index];
     }
 
     public void RemoveAt(int index)
     {
-        if (index < 0  index >= _count)
+        if (index < 0 || index >= _count)
             throw new IndexOutOfRangeException("Индекс вне допустимого диапазона!");
 
         for (int i = index; i < _count - 1; i++)
