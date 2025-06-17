@@ -1,0 +1,182 @@
+using System;
+using System.Collections.Generic;
+
+namespace EmployeeManagementSystem
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Management management = new Management();
+            management.Start();
+        }
+    }
+
+    public class Employee
+    {
+        public string FullName { get; private set; }
+        public int Age { get; private set; }
+        public string BirthDate { get; private set; }
+
+        public Employee(string fullName, int age, string birthDate)
+        {
+            FullName = fullName;
+            Age = age;
+            BirthDate = birthDate;
+        }
+    }
+
+    public class Management
+    {
+        private const string CommandAddEmployee = "1";
+        private const string CommandRemoveEmployee = "2";
+        private const string CommandListEmployees = "3";
+        private const string CommandSearchEmployees = "4";
+        private const string CommandExit = "5";
+
+        private List<Employee> _employees;
+
+        public Management()
+        {
+            _employees = new List<Employee>();
+        }
+
+        public void Start()
+        {
+            bool isRunning = true;
+            string userCommand;
+
+            while (isRunning)
+            {
+                Console.Clear();
+                Console.WriteLine("Меню:");
+                Console.WriteLine($"1. Добавить сотрудника ({CommandAddEmployee})");
+                Console.WriteLine($"2. Удалить сотрудника ({CommandRemoveEmployee})");
+                Console.WriteLine($"3. Список сотрудников ({CommandListEmployees})");
+                Console.WriteLine($"4. Поиск сотрудников ({CommandSearchEmployees})");
+                Console.WriteLine($"5. Выход ({CommandExit})");
+                Console.Write("Введите команду: ");
+                userCommand = Console.ReadLine();
+                Console.WriteLine();
+
+                switch (userCommand)
+                {
+                    case CommandAddEmployee:
+                        AddEmployee();
+                        break;
+                    case CommandRemoveEmployee:
+                        RemoveEmployee();
+                        break;
+                    case CommandListEmployees:
+                        ListEmployees();
+                        break;
+                    case CommandSearchEmployees:
+                        SearchEmployees();
+                        break;
+                    case CommandExit:
+                        isRunning = false;
+                        break;
+                    default:
+                        Console.WriteLine("Некорректная команда!");
+                        break;
+                }
+
+                if (isRunning)
+                {
+                    Console.WriteLine("Нажмите любую клавишу для продолжения...");
+                    Console.ReadKey();
+                }
+            }
+        }
+
+        private void AddEmployee()
+        {
+            Console.Write("ФИО: ");
+            string fullName = Console.ReadLine();
+            Console.Write("Возраст: ");
+            int age = int.Parse(Console.ReadLine());
+            Console.Write("Дата рождения (например, 01.01.1990): ");
+            string birthDate = Console.ReadLine();
+
+            _employees.Add(new Employee(fullName, age, birthDate));
+            Console.WriteLine("Сотрудник успешно добавлен!");
+        }
+
+        private void RemoveEmployee()
+        {
+            if (_employees.Count == 0)
+            {
+                Console.WriteLine("Список сотрудников пуст!");
+                return;
+            }
+
+            ListEmployees();
+            Console.Write("Введите ID сотрудника для удаления: ");
+
+            bool isRunning = true;
+            while (isRunning)
+            {
+                if (int.TryParse(Console.ReadLine(), out int index))
+                {
+                    if (index > 0 && index <= _employees.Count)
+                    {
+                        _employees.RemoveAt(index - 1);
+                        Console.WriteLine("Сотрудник успешно удалён!");
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Некорректный ID!");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Введите числовой ID!");
+                }
+            }
+        }
+
+        private void ListEmployees()
+        {
+            if (_employees.Count == 0)
+            {
+                Console.WriteLine("Список сотрудников пуст.");
+                return;
+            }
+
+            Console.WriteLine("Список сотрудников:");
+            for (int i = 0; i < _employees.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. ФИО: {_employees[i].FullName}, Возраст: {_employees[i].Age}, Дата рождения: {_employees[i].BirthDate}");
+            }
+        }
+
+        private void SearchEmployees()
+        {
+            if (_employees.Count == 0)
+            {
+                Console.WriteLine("База сотрудников пуста!");
+                return;
+            }
+
+            Console.Write("Введите ФИО, возраст или дату рождения: ");
+            string searchQuery = Console.ReadLine().ToLower();
+            int.TryParse(searchQuery, out int age);
+
+            bool found = false;
+
+            foreach (Employee employee in _employees)
+            {
+                if (employee.FullName.ToLower().Contains(searchQuery) || employee.Age == age ||
+                    employee.BirthDate.Contains(searchQuery))
+                {
+                    Console.WriteLine($"ФИО: {employee.FullName}, Возраст: {employee.Age}, Дата рождения: {employee.BirthDate}");
+                    found = true;
+                }
+            }
+
+            if (!found)
+                Console.WriteLine("Сотрудник не найден!");
+        }
+    }
+}
